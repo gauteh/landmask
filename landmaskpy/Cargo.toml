@@ -5,10 +5,10 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-landmask = { path = "../" }
+landmask = { version = "0.1.0", path = "../" }
 pyo3 = { version = "*", features = ["extension-module"] }
 numpy = "*"
 
 [lib]
-name = "landmaskpy"
+name = "landmask"
 crate-type = ["cdylib"]

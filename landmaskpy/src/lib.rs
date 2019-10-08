@@ -25,11 +25,10 @@ impl Landmask {
         py: Python<'_>,
         x: &PyArrayDyn<f64>,
         y: &PyArrayDyn<f64>) -> Vec<bool> {
-        let x = x.as_array();
-        let y = y.as_array();
+        let x = x.as_slice().unwrap();
+        let y = y.as_slice().unwrap();
 
-        let c = py.allow_threads(move ||
-            contains_many(&self.rtree, x.as_slice().unwrap(), y.as_slice().unwrap()));
+        let c = py.allow_threads(move || contains_many(&self.rtree, x, y));
 
         c
     }
