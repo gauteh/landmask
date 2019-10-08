@@ -1,0 +1,14 @@
+[package]
+authors = ["Gaute Hope <gaute.hope@met.no>"]
+name = "landmaskpy"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+landmask = { path = "../" }
+pyo3 = { version = "*", features = ["extension-module"] }
+numpy = "*"
+
+[lib]
+name = "landmaskpy"
+crate-type = ["cdylib"]
