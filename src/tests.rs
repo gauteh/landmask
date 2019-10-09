@@ -47,6 +47,8 @@ mod bench {
             }
         }
 
+        println! ("checking {} points", xx.len()); // 64800 points
+
         b.iter (|| contains_many(&tree, xx.as_slice(), yy.as_slice()));
     }
 }

@@ -1,24 +1,31 @@
-# word-count
-
-Demonstrates searching for a file in plain python, with rust singlethreaded and with rust multithreaded.
+# landmaskpy
 
 ## Build
 
 ```shell
-python setup.py install
+maturin develop --release
+```
+
+make sure you use `--release`, otherwise things will go slowly. To install as package do:
+
+```shell
+maturin build --release
+pip install target/wheels/landmask-....whl
 ```
 
 ## Usage
 
 ```python
-from word_count import search_py, WordCounter
+from landmask import Landmask
 
-search_py("path/to/file", "word")
-WordCounter("path/to/file").search("word")
-WordCounter("path/to/file").search_sequential("word")
+mask = Landmask("path/to/file.wkb")
+
+x = np.array([5, 15], dtype = 'float64')
+y = np.array([64, 65], dtype = 'float64')
+l = mask.contains_many (x, y)
 ```
 
-## Benchmark
+## Benchmarks and tests
 
 Install the depedencies:
 
@@ -26,17 +33,9 @@ Install the depedencies:
 pip install -r requirements-dev.txt
 ```
 
-
-There is a benchmark in `tests/test_word_count.py`:
+There is a benchmark in `tests/test_landmask.py`:
 
 ```shell
 pytest -v tests
 ```
 
-## Testing
-
-To test python 3.5, 3.6 and 3.7, install tox globally and run
-
-```shell
-tox
-```

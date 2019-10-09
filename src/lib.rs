@@ -11,7 +11,6 @@ use geo::algorithm::contains::*;
 pub use rstar::{RTree, RTreeParams, RStarInsertionStrategy, RTreeObject,
                 AABB, PointDistance};
 use rayon::prelude::*;
-use num_traits::Float;
 
 mod tests;
 
@@ -49,63 +48,7 @@ impl PointDistance for PolyWrapper
 
     fn contains_point(&self, point: &[f64; 2]) -> bool {
         let p = geo::Point::new(point[0], point[1]);
-
-        /// The position of a `Point` with respect to a `LineString`
-        enum PositionPoint {
-            OnBoundary,
-            Inside,
-            Outside,
-        }
-
-        /// Calculate the position of `Point` p relative to a linestring
-        fn get_position<T>(p: Point<T>, linestring: &LineString<T>) -> PositionPoint
-        where
-            T: Float,
-        {
-            // See: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-            //      http://geospatialpython.com/search
-            //         ?updated-min=2011-01-01T00:00:00-06:00&updated-max=2012-01-01T00:00:00-06:00&max-results=19
-
-            // LineString without points
-            if linestring.0.is_empty() {
-                return PositionPoint::Outside;
-            }
-            // Point is on linestring
-            // if linestring.contains(&p) {
-            //     return PositionPoint::OnBoundary;
-            // }
-
-            let mut xints = T::zero();
-            let mut crossings = 0;
-            for line in linestring.lines() {
-                if p.y() > line.start.y.min(line.end.y)
-                    && p.y() <= line.start.y.max(line.end.y)
-                    && p.x() <= line.start.x.max(line.end.x)
-                {
-                    if line.start.y != line.end.y {
-                        xints = (p.y() - line.start.y) * (line.end.x - line.start.x)
-                            / (line.end.y - line.start.y)
-                            + line.start.x;
-                    }
-                    if (line.start.x == line.end.x) || (p.x() <= xints) {
-                        crossings += 1;
-                    }
-                }
-            }
-            if crossings % 2 == 1 {
-                PositionPoint::Inside
-            } else {
-                PositionPoint::Outside
-            }
-        }
-
-        match get_position(p, &self.0.exterior()) {
-            PositionPoint::OnBoundary | PositionPoint::Outside => false,
-            _ => true
-        }
-
-        // let k = geo::algorithm::contains::get_position (p, &self.0.exterior());
-        // self.0.contains(&p)
+        self.0.contains(&p)
     }
 }
 

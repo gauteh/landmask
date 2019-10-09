@@ -5,7 +5,6 @@ name = "landmask"
 version = "0.1.0"
 [dependencies]
 geo = "*"
-num-traits = "*"
 rayon = "*"
 rstar = "*"
 wkb = "*"
