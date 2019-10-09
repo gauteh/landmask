@@ -4,7 +4,7 @@ use landmask::*;
 
 #[pyclass(module = "landmask")]
 struct Landmask {
-    rtree: RTree<PolyWrapper>
+    rtree: LargeNodeRTree<PolyWrapper>
 }
 
 #[pymethods]

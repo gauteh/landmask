@@ -3,9 +3,9 @@ authors = ["Gaute Hope <gaute.hope@met.no>"]
 edition = "2018"
 name = "landmask"
 version = "0.1.0"
-
 [dependencies]
 geo = "*"
+num-traits = "*"
 rayon = "*"
 rstar = "*"
 wkb = "*"

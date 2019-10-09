@@ -8,7 +8,7 @@ def test_load_coarse(benchmark):
 
 def test_many_points(benchmark):
   xx, yy = np.mgrid[-180:180,-90:90] # 64800 points
-  l = Landmask(old.GSHHS['c'])
+  l = Landmask(old.GSHHS['h'])
   xx = xx.astype('float64')
   yy = yy.astype('float64')
 
