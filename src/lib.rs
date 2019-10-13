@@ -9,7 +9,7 @@ use geo::algorithm::bounding_rect::BoundingRect;
 use geo::algorithm::euclidean_distance::EuclideanDistance;
 use geo::algorithm::contains::*;
 pub use rstar::{RTree, RTreeParams, RStarInsertionStrategy, RTreeObject,
-                AABB, PointDistance};
+                AABB, PointDistance, Envelope};
 use rayon::prelude::*;
 
 mod tests;
@@ -27,15 +27,21 @@ impl RTreeParams for LargeNodeParameters
 // Optional but helpful: Define a type alias for the new r-tree
 pub type LargeNodeRTree<T> = RTree<T, LargeNodeParameters>;
 
-pub struct PolyWrapper(geo::Polygon<f64>);
+pub struct PolyWrapper(geo::Polygon<f64>, AABB<[f64; 2]>);
+
+impl PolyWrapper {
+    fn new(gp: geo::Polygon<f64>) -> PolyWrapper {
+        let r = gp.bounding_rect().unwrap();
+        PolyWrapper (gp, AABB::from_corners([r.min.x, r.min.y], [r.max.x, r.max.y]))
+    }
+}
 
 impl RTreeObject for PolyWrapper
 {
     type Envelope = AABB<[f64; 2]>;
 
     fn envelope(&self) -> Self::Envelope {
-        let r = self.0.bounding_rect().unwrap();
-        AABB::from_corners([r.min.x, r.min.y], [r.max.x, r.max.y])
+        self.1
     }
 }
 
@@ -48,7 +54,7 @@ impl PointDistance for PolyWrapper
 
     fn contains_point(&self, point: &[f64; 2]) -> bool {
         let p = geo::Point::new(point[0], point[1]);
-        self.0.contains(&p)
+        self.1.contains_point(point) && self.0.contains(&p)
     }
 }
 
@@ -83,7 +89,7 @@ pub fn make_rtree_wkb(file: &str) -> io::Result<LargeNodeRTree<PolyWrapper>>
 
     println! ("creating rtree");
     let tree = if let Geometry::MultiPolygon(mp) = geom {
-        RTree::bulk_load_with_params(mp.into_iter().map(|p| PolyWrapper(p)).collect())
+        RTree::bulk_load_with_params(mp.into_iter().map(|p| PolyWrapper::new(p)).collect())
     } else {
         panic! ("Could not build RTree.")
     };
